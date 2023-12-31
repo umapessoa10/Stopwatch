@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+    * {
+        padding: 0;
+        margin: 0;
+    }
+
+
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .content {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        gap: 30px;
+    }
+
+    body.dark {
+        background-color: #333;
+        color: white;
+    }
+
+    body.light {
+        background-color: white;
+    }
+
+    body.dark .time {
+        border: 1px solid rgba(255, 255, 255, 0.50);
+    }
+
+    body.light .time {
+        border: 1px solid rgba(0, 0, 0, 0.25);
+    }
+
+    body.light small {
+        color: rgb(50, 50, 50);
+
+    }
+
+    body.dark small {
+        color: white;
+    }
+
+    .pie {
+        --w:150px;
+        z-index: 1;
+        
+        width: var(--w);
+        aspect-ratio: 1;
+        position: relative;
+        display: inline-grid;
+        place-content: center;
+        margin: 5px;
+        font-size: 25px;
+        font-weight: bold;
+        font-family: sans-serif;
+    }
+    .pie:before {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        inset: 0;
+        background: conic-gradient(var(--c) calc(var(--p)*1%),#0000 0);
+        -webkit-mask:radial-gradient(farthest-side,#0000 calc(99% - var(--b)),#000 calc(100% - var(--b)));
+            mask:radial-gradient(farthest-side,#0000 calc(99% - var(--b)),#000 calc(100% - var(--b)));
+    }
+
+
+    .time {
+        width: 200px;
+        height: 100px;
+        border: 1px solid rgba(0, 0, 0, 0.25);
+        border-radius: 15px;
+        display: flex;
+        justify-content: space-around;
+        align-items: top;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.25);
+        position: relative;
+    }
+
+    .time > div {
+        box-sizing: border-box;
+        padding: 5px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+        height: 60%;
+        text-align: center;
+        font-size: 0.9rem;
+    }
+
+    .time > div > input{
+        width: 80%;
+
+    }
+
+    .start {
+        position: absolute;
+        left: calc(50% - 10px);
+        padding: 5px;
+        margin: 5px;
+        transform: translateX(-50%);
+        bottom: 0;
+    }
+
+    small {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        color: rgb(50, 50, 50);
+        margin: 5px;
+    }
+
+    small > a {
+        text-decoration: none;
+    }
+
+    #time-span-element {
+        z-index: 100;
+    }
+
+    .switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+    }
+
+    .switch input { 
+    opacity: 0;
+    width: 0;
+    height: 0;
+    }
+
+    .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+    }
+
+    .slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+    }
+
+    input:checked + .slider {
+    background-color: #2196F3;
+    }
+
+    input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+    }
+
+    input:checked + .slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+    }
+
+    /* Rounded sliders */
+    .slider.round {
+    border-radius: 34px;
+    }
+
+    .slider.round:before {
+    border-radius: 50%;
+    }
+
+    .switch-wrapper {
+        position: fixed;
+        right: 15px;
+        top: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.3rem;
+    }
+
+    .title {
+        position: absolute;
+        top: 10%;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 3rem;
+    }
+    </style>
+</head>
+<body>
+    <div>
+    <div class="switch-wrapper">
+        <span>Dark mode</span>
+        <label class="switch">
+            <input type="checkbox">
+            <span class="slider round" onclick="toggleMode()"></span>
+        </label>
+    </div>
+    <h1 class="title">Stopwatch</h1>
+    <div class="content">
+        <div class="pie" style="--p: 100; --b: 20px; --c: red;">
+            <span id="time-span-element">0s</span>
+        </div>
+        <div class="time">
+            <div>
+                <span>Seconds</span>
+                <input type="number" class="times" id="seconds" name="seconds" value="0" max="59">
+            </div>
+            <div>
+                <span>Minutes</span>
+                <input type="number" class="times" id="minutes" name="minutes" value="0" max="59">
+            </div>
+            <div>
+                <span>Hours</span>
+                <input type="number" class="times" id="hours" name="hours" value="0">
+            </div>
+            <button class="start" onclick="if(inCtdwn){alert('You are already in a countdown!')}else{startTimer()}">Start</button>
+        </div>
+    </div>
+    <small>Made by <a href="https://www.github.com/umapessoa10">Felipe_Offlin3</a></small>
+    </div>
+</body>
+<script>
+    const pie = document.querySelector(".pie");
+    const timeSpanElement = document.getElementById("time-span-element");
+    const sliderRound = document.querySelector(".slider")
+    const ringtone = new Audio('ringtone.mp3');
+
+    let inCtdwn = false;
+    let darkTheme = 0;
+
+    function interpolateColor(color1, color2, steps, step) {
+        // Convert hex color to HSL
+        function hexToHsl(hex) {
+            let r = parseInt(hex.slice(1, 3), 16) / 255;
+            let g = parseInt(hex.slice(3, 5), 16) / 255;
+            let b = parseInt(hex.slice(5, 7), 16) / 255;
+            let max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+
+            if (max === min) {
+                h = s = 0; // achromatic
+            } else {
+                let d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                    case g: h = (b - r) / d + 2; break;
+                    case b: h = (r - g) / d + 4; break;
+                }
+                h /= 6;
+            }
+
+            return [h * 360, s * 100, l * 100];
+        }
+
+        // Linearly interpolate between two values
+        function lerp(start, end, amt) {
+            return (1 - amt) * start + amt * end;
+        }
+
+        // Convert HSL to hex
+        function hslToHex(h, s, l) {
+            l /= 100;
+            const a = s * Math.min(l, 1 - l) / 100;
+            const f = n => {
+                const k = (n + h / 30) % 12;
+                const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+                return Math.round(255 * color).toString(16).padStart(2, '0');
+            };
+            return `#${f(0)}${f(8)}${f(4)}`;
+        }
+
+        // Ensure step is in the range
+        step = Math.max(0, Math.min(step, steps));
+
+        // Convert hex to HSL
+        var hsl1 = hexToHsl(color1);
+        var hsl2 = hexToHsl(color2);
+
+        // Calculate the ratio
+        var ratio = step / steps;
+
+        // Interpolate H, S, and L values
+        var h = lerp(hsl1[0], hsl2[0], ratio);
+        var s = lerp(hsl1[1], hsl2[1], ratio);
+        var l = lerp(hsl1[2], hsl2[2], ratio);
+
+        // Convert back to hex
+        return hslToHex(h, s, l);
+    }
+
+
+    function startTimer() {
+        var timeSpans = document.querySelectorAll(".times");
+        let values = [];
+
+       
+
+        for (let i = 0; i < timeSpans.length; i++) {
+            values.push(parseInt(timeSpans[i].value));
+        }
+
+        if (!values[0] && !values[1] && !values[2]) {
+            alert("You need to input a time!")
+            timeSpans.forEach(function(timeSpan, i) {
+                timeSpan.value = 0;
+            })
+            inCtdwn = false;
+
+            return 0;
+        }
+
+        inCtdwn = true;
+
+        const finalValue = values[0] + values[1] * 60 + values[2] * 3600;
+        var counter = finalValue;
+
+        var i = setInterval(function() {
+            let hours = Math.floor(counter / 3600);
+            let minutes = Math.floor((counter % 3600) / 60);
+            let seconds = counter % 60;
+
+            let timeString = '';
+            if (hours > 0) {
+                timeString += hours + "h ";
+                timeSpanElement.style.fontSize = "1.3rem";
+            }
+            if (minutes > 0) {
+                timeString += minutes + "m ";
+                timeSpanElement.style.fontSize = "1.5rem";
+            }
+            if (seconds > 0) {
+                timeString += seconds + "s";
+            }
+
+            
+
+            timeSpanElement.innerHTML = timeString;
+            pie.style.setProperty('--p', (counter / finalValue) * 100);
+            pie.style.setProperty('--c', interpolateColor("#FF0000", "#00FF00", 100, (counter / finalValue) * 100));
+
+            counter--;
+            if (counter < 0) {
+                clearInterval(i);
+                
+                ringtone.play();
+                timeSpanElement.innerHTML = "<button onclick='stopAudio()'>Stop Audio</button>";
+                pie.style.setProperty('--p', 100)
+                pie.style.setProperty('--c', "red")
+                inCtdwn = false;
+            }
+        }, 1000);
+    }
+
+    function stopAudio() {
+        ringtone.pause(); timeSpanElement.innerHTML = '0s'
+    }
+
+    function toggleMode() {
+        darkTheme += 1;
+        darkTheme = darkTheme % 2;
+        console.log(darkTheme);
+
+        if (darkTheme == 1) {
+            document.body.classList.remove("light")
+            document.body.classList.add("dark")
+        } else {
+            document.body.classList.remove("dark")
+            document.body.classList.add("light")
+        }
+    }
+</script>
+
+</html>
